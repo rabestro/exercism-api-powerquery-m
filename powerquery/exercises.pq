@@ -4,31 +4,20 @@
 
     Usage:
     1. Load this file into Power Query.
-    2. Call the function `GetExercises` with the desired track name.
+    2. Call the function with the desired track name.
 */
 (track as text) =>
     let
-        uri = "https://exercism.org/api/v2/tracks/" & track & "/exercises",
-        content = Web.Contents(uri),
-        jsonDoc = Json.Document(content),
-        exerciseList = Table.FromList(jsonDoc[exercises], Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+        API_URL = "https://exercism.org/api/v2/tracks/" & track & "/exercises",
+        Content = Web.Contents(API_URL),
+        JsonDoc = Json.Document(Content),
+        ExerciseList = Table.FromList(JsonDoc[exercises], Splitter.SplitByNothing(), null, null, ExtraValues.Error),
         ExerciseEntries = Table.ExpandRecordColumn(
-            exerciseList,
+            ExerciseList,
             "Column1",
-            {
-                "slug",
-                "type",
-                "title",
-                "icon_url",
-                "difficulty",
-                "blurb",
-                "is_external",
-                "is_unlocked",
-                "is_recommended"
-            },
-            {"slug", "Type", "Title", "Icon", "Difficulty", "Blurb", "IsExternal", "IsUnlocked", "IsRecommended"}
+            {"slug", "type", "title", "difficulty", "blurb", "is_external", "is_unlocked", "is_recommended"},
+            {"slug", "Type", "Title", "Difficulty", "Blurb", "IsExternal", "IsUnlocked", "IsRecommended"}
         ),
-
         Exercises = Table.TransformColumnTypes(
             ExerciseEntries,
             {
