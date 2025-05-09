@@ -28,8 +28,7 @@
                 {"Difficulty", type text},
                 {"slug", type text},
                 {"Type", type text},
-                {"Title", type text},
-                {"Icon", type text}
+                {"Title", type text}
             }
         )
     in
