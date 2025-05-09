@@ -29,7 +29,7 @@ This repository contains Power Query functions for fetching data from the Exerci
 * **Usage:**
     1.  Import the `Exercises.pq` file into Power Query.
     2.  Create a new blank query.
-    3.  In the formula bar, invoke the function: `= Exercises("track-slug")`, replacing `"track-slug"` with the desired track slug (e.g., `"java"`, `"python"`, `"csharp"`).
+    3.  In the formula bar, invoke the function: `Exercises("track-slug")`, replacing `"track-slug"` with the desired track slug (e.g., `"java"`, `"python"`, `"csharp"`).
     4.  The output will be a table with the following columns:
         * `slug` (text): The exercise's unique identifier.
         * `Type` (text): The type of exercise.
@@ -39,6 +39,8 @@ This repository contains Power Query functions for fetching data from the Exerci
         * `IsExternal` (logical): Indicates if the exercise is external.
         * `IsUnlocked` (logical): Indicates if the exercise is unlocked.
         * `IsRecommended` (logical): Indicates if the exercise is recommended.
+
+![exercises-awk.png](assets/exercises-awk.png)
 
 ## Prerequisites
 
