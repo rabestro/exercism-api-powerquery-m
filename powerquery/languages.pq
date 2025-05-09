@@ -1,10 +1,13 @@
+/*
+    
+*/
 let
-    uri = "https://exercism.org/api/v2/tracks",
-    content = Web.Contents(uri),
-    jsonDoc = Json.Document(content),
-    tracks = Table.FromList(jsonDoc[tracks], Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    API_URL = "https://exercism.org/api/v2/tracks",
+    Content = try Web.Contents(API_URL, [Timeout=#duration(0, 0, 30, 0)]) otherwise error "Failed to fetch data from API",
+    JsonDoc = try Json.Document(Content) otherwise error "Invalid JSON response from API",
+    Tracks = Table.FromList(JsonDoc[tracks], Splitter.SplitByNothing(), null, null, ExtraValues.Error),
     Languages = Table.ExpandRecordColumn(
-        tracks,
+        Tracks,
         "Column1",
         {
             "slug",
