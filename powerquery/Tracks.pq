@@ -24,7 +24,7 @@ let
         try
             Json.Document(Content)
         otherwise
-            error "Invalid JSON response from API. Content received: " & Text.FromBinary(Content),
+            error "Invalid JSON response from API. Content received: " & Text.FromBinary(Content, TextEncoding.Utf8),
 
     // Extract the list of tracks from the JSON structure
     // Assumes the JSON response has a top-level key "tracks" which is a list
