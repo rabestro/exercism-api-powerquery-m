@@ -38,7 +38,7 @@ let
         InitialTable,
         "Column1", // Default column name from Table.FromList
         {"slug", "title", "course", "num_concepts", "num_exercises", "web_url", "tags"},
-        {"TrackID", "Title", "HasCourse", "ConceptsCount", "ExercisesCount", "WebURL", "TagsList"}
+        {"slug", "Title", "HasCourse", "ConceptsCount", "ExercisesCount", "WebURL", "TagsList"}
     ),
 
     // Convert the "TagsList" (which is a list) into a single comma-separated text string
@@ -50,7 +50,7 @@ let
     TypedTracks = Table.TransformColumnTypes(
         FormattedTags,
         {
-            {"TrackID", type text},
+            {"slug", type text},
             {"Title", type text},
             {"HasCourse", type logical},
             {"ConceptsCount", Int64.Type},
