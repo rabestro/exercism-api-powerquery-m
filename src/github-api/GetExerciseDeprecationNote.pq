@@ -16,20 +16,8 @@ let
     // Define the relative path for the specific .deprecated file
     RelativeDeprecationFilePath = "exercises/" & Uri.EscapeDataString(exerciseSlug) & "/.deprecated",
 
-    // Define request headers, including the GitHub API Token if available
-    RequestHeaders =
-        let
-            // Standard GitHub API Accept header + User-Agent
-            BaseHeaders = [
-                #"Accept"="application/vnd.github.v3+json",
-                #"User-Agent"="PowerQuery-ExercismClient/1.0 (+https://github.com/Rabestro/exercism-api-powerquery-m)"
-            ],
-            TokenValue = try GitHubAPIToken otherwise null // Safely check for GitHubAPIToken parameter
-        in
-            if TokenValue <> null and TokenValue <> "" then
-                BaseHeaders & [#"Authorization"="token " & TokenValue] // Add Authorization if token exists
-            else
-                BaseHeaders, // Only BaseHeaders if no token
+    // Get standard GitHub API headers by calling the helper function
+    RequestHeaders = GetGitHubApiHeaders(),
 
     // Attempt to fetch the file metadata and content using the GitHub Contents API
     DeprecationNote =
