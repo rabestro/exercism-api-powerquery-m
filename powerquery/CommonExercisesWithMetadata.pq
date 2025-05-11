@@ -1,4 +1,4 @@
-// Query Name: GetCommonExercisesWithMetadata
+// Query Name: CommonExercisesWithMetadata
 let
     // Helper function to fetch and parse metadata.toml for a given exercise slug
     fxGetExerciseMetadata = (exerciseSlug as text) as record =>
@@ -18,13 +18,15 @@ let
                 try
                     let
                         WebContent = Web.Contents(
-                            MetadataURL, [
-                                Headers = [#"User-Agent" = "PowerQuery"],
+                            MetadataURL,
+                            [
+                                Headers = [#"User-Agent" = "PowerQuery-Exercism-Metadata-Fetcher"],
+                                // Good practice to set User-Agent
                                 Timeout = #duration(0, 0, 15, 0)
                                 // 15-second timeout for individual file
                             ]
                         ),
-                        TextContent = Text.FromBinary(WebContent, TextEncoding.Utf8),
+                        TextContent = Text.FromBinary(WebContent, TextEncoding.UTF8),
                         Lines = Lines.FromText(TextContent),
                         // Inner helper to extract a value for a given key from TOML-like lines
                         GetValueFromLines = (textLines as list, keyName as text) as nullable text =>
@@ -60,52 +62,16 @@ let
 
     // --- Main Query Logic Starts Here ---
 
-    // Define the GitHub API URL for the problem-specifications exercises directory
-    SourceURL = "https://api.github.com/repos/exercism/problem-specifications/contents/exercises?ref=main",
-    // Fetch the list of exercises from the GitHub API
-    WebContent = Web.Contents(
-        SourceURL,
-        [
-            Headers = [
-                #"Accept" = "application/vnd.github.v3+json",
-                // Recommended by GitHub API
-                #"User-Agent" = "PowerQuery"
-            ],
-            Timeout = #duration(0, 0, 30, 0)
-            // 30-second timeout for the main list
-        ]
-    ),
-    // Parse the JSON response for the list of exercises
-    ParsedJson =
-        try
-            Json.Document(WebContent)
-        otherwise
-            error
-                "Failed to parse JSON from GitHub API. URL: "
-                    & SourceURL
-                    & ". Response: "
-                    & Text.FromBinary(WebContent, TextEncoding.UTF8),
-    // Convert the list of exercise records (files and directories) into a table
-    SourceTable = Table.FromList(ParsedJson, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
-    // Expand the 'Column1' which contains the records for each item
-    ExpandedContent = Table.ExpandRecordColumn(
-        SourceTable, "Column1", {"name", "path", "type", "html_url"},
-        // Fields to expand
-        {"Name", "Path", "Type", "HtmlURL"}
-        // New column names
-    ),
-    // Filter the table to include only directories, as exercises are represented by directories
-    FilteredToDirectories = Table.SelectRows(ExpandedContent, each ([Type] = "dir")),
-    // Select and rename columns for the base exercise list
-    BaseExercisesTable = Table.SelectColumns(FilteredToDirectories, {"Name", "HtmlURL"}),
-    RenamedBaseTable = Table.RenameColumns(
-        BaseExercisesTable, {{"Name", "ExerciseSlug"}, {"HtmlURL", "ProblemSpecificationURL"}}
-    ),
-    // Add a new column by invoking the helper function to get metadata for each exercise
-    ExercisesWithMetadataColumn = Table.AddColumn(
-        RenamedBaseTable, "Metadata", each fxGetExerciseMetadata([ExerciseSlug])
-    ),
-    // Expand the 'Metadata' record column to get individual metadata fields
+    // Step 1: Reference the existing 'CommonExercises' query
+    // This query is expected to return a table with at least a 'slug' column,
+    // and ideally a 'Problem Specification URL' column.
+    BaseExercisesTable = CommonExercises,
+
+    // Step 2: Add a new column by invoking the helper function to get metadata for each exercise
+    // This assumes 'BaseExercisesTable' has a 'slug' column (lowercase).
+    ExercisesWithMetadataColumn = Table.AddColumn(BaseExercisesTable, "Metadata", each fxGetExerciseMetadata([slug])),
+
+    // Step 3: Expand the 'Metadata' record column to get individual metadata fields
     ExpandedExercisesWithMetadata = Table.ExpandRecordColumn(
         ExercisesWithMetadataColumn,
         "Metadata",
@@ -114,22 +80,29 @@ let
         {"Title", "Blurb", "Source", "SourceURL", "MetadataError"}
         // New column names for these fields
     ),
-    // Select the final set of columns as requested
+
+    // Step 4: Select the final set of columns as requested
+    // This ensures the output has the 'slug' and 'Problem Specification URL' from the CommonExercises query,
+    // plus the newly fetched metadata.
     FinalColumnsSelected = Table.SelectColumns(
         ExpandedExercisesWithMetadata,
-        {"ExerciseSlug", "ProblemSpecificationURL", "Title", "Blurb", "Source", "SourceURL", "MetadataError"}
+        {"slug", "Problem Specification URL", "Title", "Blurb", "Source", "SourceURL", "MetadataError"}
     ),
-    // Set data types for the final columns
+    
+    // Step 5: Set data types for the final columns
     TypedResult = Table.TransformColumnTypes(
         FinalColumnsSelected,
         {
-            {"ExerciseSlug", type text},
-            {"ProblemSpecificationURL", type text},
+            {"slug", type text},
+            // Changed from ExerciseSlug
+            {"Problem Specification URL", type text},
+            // Changed from ProblemSpecificationURL
             {"Title", type text},
             {"Blurb", type text},
             {"Source", type text},
             {"SourceURL", type text},
             {"MetadataError", type text}
+            // Column to indicate any errors during metadata fetching/parsing
         }
     )
 in
