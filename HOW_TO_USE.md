@@ -43,6 +43,8 @@ in
     ExercisesToConsiderForAwk
 ```
 
+![todo-awk-step2.png](assets/todo-awk-step2.png)
+
 ## How to Use
 
 1.  In Power Query (Excel, Power BI, etc.), create a new blank query.
