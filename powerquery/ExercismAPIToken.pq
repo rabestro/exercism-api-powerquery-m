@@ -16,7 +16,6 @@
 //    with your actual Exercism API Token.
 // 3. Other M queries designed to call the Exercism API can then reference this parameter
 //    by its name (e.g., ExercismAPIToken) to include the token in API request headers
-//    (typically as a Bearer token: "Authorization: Bearer YOUR_TOKEN").
 //
 // Security Note:
 // - Avoid committing your actual token to version control if this file is part of a public repository.

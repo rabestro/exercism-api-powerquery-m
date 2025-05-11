@@ -1,11 +1,13 @@
 # Identifying BASH Exercises Missing from AWK
 
-As the maintainer of the AWK track on Exercism, I often look to the BASH track for exercises that can be ported. Many BASH exercises have tests and concepts that are highly adaptable to AWK. This guide outlines how to use our `Exercises` Power Query function to get a clear list of BASH exercises that aren't yet in the AWK track.
+As the maintainer of the AWK track on Exercism, I often look to the BASH track for exercises that can be ported.
+Many BASH exercises have tests and concepts that are highly adaptable to AWK.
+This guide outlines how to use our `GetTrackExercises` Power Query function to get a clear list of BASH exercises that aren't yet in the AWK track.
 
 ## Setup
 
-Ensure the `Exercises` function is loaded in your Power Query environment. You can find its definition in this repository at:
-[`powerquery/Exercises.pq`](powerquery/Exercises.pq)
+Ensure the `GetTrackExercises` function is loaded in your Power Query environment. You can find its definition in this repository at:
+[`powerquery/GetTrackExercises.pq`](powerquery/GetTrackExercises.pq)
 
 ## The Query
 
@@ -14,11 +16,11 @@ Here’s the M code. You can drop this into the Advanced Editor of a new blank q
 ```powerquery
 let
     // Step 1: Load exercises from the BASH track
-    // This utilizes our Exercises.pq function.
-    BashExercises = Exercises("bash"),
+    // This utilizes our GetTrackExercises.pq function.
+    BashExercises = GetTrackExercises("bash"),
 
     // Step 2: Load exercises from the AWK track
-    AwkExercises = Exercises("awk"),
+    AwkExercises = GetTrackExercises("awk"),
 
     // Step 3: Find exercises present in BashExercises but not in AwkExercises
     // We use a Left Anti-Join on the 'slug' column, which uniquely identifies exercises.
