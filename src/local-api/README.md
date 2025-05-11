@@ -33,8 +33,6 @@ While currently tailored for `problem-specifications`, the `ExercismReposRootPat
   * **Rename the imported query to `ExercismReposRootPath`**.
   * Edit this `ExercismReposRootPath` query and replace the placeholder path with the **absolute path** to your root directory where you cloned the Exercism repositories (e.g., `~/ExercismClones` from the example above). See the comments within `ExercismReposRootPath.pq` for detailed instructions.
 
-   ![ExercismReposRootPath.png](../../assets/ExercismReposRootPath.png)
-
 3.  **Import Utilities:**
   * Import the other `.pq` files from this `local-api` directory into your Power Query environment.
   * **Rename the imported queries** to match the suggested names (e.g., `GetLocalMetadata`, `LocalExercisesWithDetails`) for dependencies to work correctly. This is typically done by right-clicking the query in the Power Query Editor's "Queries" pane and selecting "Rename".
