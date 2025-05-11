@@ -1,4 +1,4 @@
-// Function Name: ExerciseMetadata
+// Function Name: GetExerciseMetadata
 // Description: Fetches and parses the metadata.toml file for a given Exercism exercise slug
 //              from the exercism/problem-specifications repository.
 // Parameter:
@@ -15,7 +15,7 @@ let
     FetchedMetadata = try
         let
             WebContent = Web.Contents(MetadataURL, [
-                Headers=[#"User-Agent"="PowerQuery-Exercism-Metadata-Fetcher"], // Good practice to set User-Agent
+                Headers=[#"User-Agent"="PowerQuery-ExercismClient/1.0 (+https://github.com/Rabestro/exercism-api-powerquery-m)"],
                 Timeout=#duration(0,0,15,0) // 15-second timeout for individual file
             ]),
             TextContent = Text.FromBinary(WebContent, TextEncoding.UTF8),

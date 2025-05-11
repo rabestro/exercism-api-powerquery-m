@@ -10,7 +10,7 @@ let
         [
             Headers = [
                 #"Accept" = "application/vnd.github.v3+json",
-                #"User-Agent" = "PowerQuery"
+                #"User-Agent"="PowerQuery-ExercismClient/1.0 (+https://github.com/Rabestro/exercism-api-powerquery-m)"
             ],
             Timeout = #duration(0, 0, 30, 0)
             // 30-second timeout
