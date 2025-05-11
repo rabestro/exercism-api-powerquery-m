@@ -1,7 +1,7 @@
 // Function Name: GetExerciseDeprecationNote
 // Description: Checks for a '.deprecated' file for a given Exercism exercise slug in the
-//              exercism/problem-specifications repository and returns its content if found.
-//              Optimized to reduce connection prompts and for robust 404 error handling.
+//              exercism/problem-specifications repository using the GitHub Contents API
+//              and returns its content if found.
 // Parameter:
 //   exerciseSlug (text): The slug of the exercise (e.g., "accumulate").
 // Returns:
@@ -10,39 +10,71 @@
 //   - (Optionally) 'GitHubAPIToken' parameter: Used for authenticated requests if defined.
 
 (exerciseSlug as text) =>
-    let
-        exerciseSlug = "acronym",
-        // Define the base URL for the raw content
-        BaseURL = "https://raw.githubusercontent.com/exercism/problem-specifications/main/exercises/",
-        // Define the relative path for the specific .deprecated file
-        RelativeDeprecationFilePath = Uri.EscapeDataString(exerciseSlug) & "/.deprecated",
+let
+    // Define the base URL for the GitHub Contents API
+    BaseAPIURL = "https://api.github.com/repos/exercism/problem-specifications/contents/", // Base for contents
+    // Define the relative path for the specific .deprecated file
+    RelativeDeprecationFilePath = "exercises/" & Uri.EscapeDataString(exerciseSlug) & "/.deprecated",
 
-        // Define request headers, including the GitHub API Token if available
-        RequestHeaders =
-            let
-                BaseHeaders = [#"User-Agent"="PowerQuery-ExercismClient/1.0 (+https://github.com/Rabestro/exercism-api-powerquery-m)"],
-                TokenValue = try GitHubAPIToken otherwise null // Safely check for GitHubAPIToken parameter
-            in
-                if TokenValue <> null and TokenValue <> "" then
-                    BaseHeaders & [#"Authorization"="token " & TokenValue] // Add Authorization if token exists
-                else
-                    BaseHeaders, // Only BaseHeaders if no token
-        
-        DeprecationNote = try
-            let
-                // Attempt to fetch the content of the .deprecated file
-                // Using BaseURL and RelativePath to help Power Query manage data source privacy
-                WebContent = Web.Contents(BaseURL, [
-                    RelativePath = RelativeDeprecationFilePath, // Dynamic part of the URL
-                    Headers = RequestHeaders,
-                    Timeout = #duration(0,0,10,0), // Shorter timeout
-                    ManualStatusHandling = {404} // Treat 404 Not Found as a non-error
-                ]),
-                TextResponse = Text.FromBinary(WebContent, TextEncoding.Utf8),
-                isNotFound = Text.StartsWith(TextResponse, "404")
-            in
-                if isNotFound then null else TextResponse 
-        otherwise
-            null // Any other error during Web.Contents (e.g., network issue), treat as note not available
-    in
-        DeprecationNote
+    // Define request headers, including the GitHub API Token if available
+    RequestHeaders =
+        let
+            // Standard GitHub API Accept header + User-Agent
+            BaseHeaders = [
+                #"Accept"="application/vnd.github.v3+json",
+                #"User-Agent"="PowerQuery-ExercismClient/1.0 (+https://github.com/Rabestro/exercism-api-powerquery-m)"
+            ],
+            TokenValue = try GitHubAPIToken otherwise null // Safely check for GitHubAPIToken parameter
+        in
+            if TokenValue <> null and TokenValue <> "" then
+                BaseHeaders & [#"Authorization"="token " & TokenValue] // Add Authorization if token exists
+            else
+                BaseHeaders, // Only BaseHeaders if no token
+
+    // Attempt to fetch the file metadata and content using the GitHub Contents API
+    DeprecationNote =
+        let
+            // Using a general try...otherwise for unexpected errors during the process.
+            Result = try
+                let
+                    WebContentResponse = Web.Contents(BaseAPIURL, [
+                        RelativePath = RelativeDeprecationFilePath,
+                        Query = [ref = "main"], // Specify branch as a query parameter
+                        Headers = RequestHeaders,
+                        Timeout = #duration(0,0,15,0), // Timeout for API call
+                        ManualStatusHandling = {404} // Explicitly handle 404 as non-fatal
+                    ]),
+
+                    // Check the type of WebContentResponse.
+                    // If 404 (and handled by ManualStatusHandling), Web.Contents returns a record with response details.
+                    // If 200 OK, Web.Contents returns the binary content directly.
+                    NoteText =
+                        if Value.Is(WebContentResponse, type record) and Record.FieldOrDefault(WebContentResponse, "Response.Status", 200) = 404 then
+                            null // File not found (404), so not deprecated
+                        else if Value.Is(WebContentResponse, type binary) then // Successful fetch (200 OK)
+                            let
+                                ApiResponseJson = Json.Document(WebContentResponse),
+                                Base64Content = Text.Replace(Record.FieldOrDefault(ApiResponseJson, "content", ""), "#(lf)", ""),
+                                DecodedBinary = if Base64Content <> "" then
+                                                    Binary.FromText(Base64Content, BinaryEncoding.Base64)
+                                                else
+                                                    null,
+                                ExtractedText = if DecodedBinary <> null then
+                                                   Text.FromBinary(DecodedBinary, TextEncoding.Utf8)
+                                               else
+                                                   null
+                            in
+                                ExtractedText
+                        else
+                            // This case should ideally not be reached if ManualStatusHandling for 404 is working as expected
+                            // and other errors are caught by the outer try.
+                            // Could indicate an unhandled status code or unexpected response structure.
+                            null
+                in
+                    NoteText
+            otherwise
+                null // Outer try: Catches any other errors (network, unexpected issues), return null
+        in
+            Result
+in
+    DeprecationNote
