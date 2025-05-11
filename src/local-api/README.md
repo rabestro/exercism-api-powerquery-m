@@ -2,6 +2,8 @@
 
 This document describes the Power Query M utilities designed to work with local clones of Exercism repositories, primarily focusing on the `exercism/problem-specifications` repository at present. These utilities allow you to access exercise data directly from your file system, which is useful for offline work, avoiding API rate limits, and working with specific versions of the specifications.
 
+Primarily, these tools are designed to help you get an overview, statistics, and detailed data about exercises directly into **Microsoft Excel**. They should also work seamlessly in **Power BI Desktop** for more advanced data modeling and visualization.
+
 ## Overview
 
 The utilities in this section enable you to:
@@ -9,7 +11,7 @@ The utilities in this section enable you to:
 * List exercise slugs from your local `problem-specifications` clone.
 * Fetch and parse `metadata.toml` for each local exercise.
 * Check for and retrieve deprecation notes from local `.deprecated` files.
-* Combine all this information into a comprehensive table of local exercises with their details.
+* Combine all this information into a comprehensive table of local exercises with their details, perfect for analysis in Excel or Power BI.
 
 While currently tailored for `problem-specifications`, the `ExercismReposRootPath` parameter is designed to support future extensions for accessing data from locally cloned track repositories (e.g., `awk`, `bash`).
 
@@ -31,9 +33,13 @@ While currently tailored for `problem-specifications`, the `ExercismReposRootPat
   * **Rename the imported query to `ExercismReposRootPath`**.
   * Edit this `ExercismReposRootPath` query and replace the placeholder path with the **absolute path** to your root directory where you cloned the Exercism repositories (e.g., `~/ExercismClones` from the example above). See the comments within `ExercismReposRootPath.pq` for detailed instructions.
 
+   ![ExercismReposRootPath.png](../../assets/ExercismReposRootPath.png)
+
 3.  **Import Utilities:**
   * Import the other `.pq` files from this `local-api` directory into your Power Query environment.
-  * **Rename the imported queries** to match the suggested names (e.g., `GetLocalMetadata`, `LocalExercisesWithDetails`) for dependencies to work correctly.
+  * **Rename the imported queries** to match the suggested names (e.g., `GetLocalMetadata`, `LocalExercisesWithDetails`) for dependencies to work correctly. This is typically done by right-clicking the query in the Power Query Editor's "Queries" pane and selecting "Rename".
+
+    ![local-api-utilities.png](../../assets/local-api-utilities.png)
 
 ## Available Utilities
 
@@ -89,7 +95,9 @@ While currently tailored for `problem-specifications`, the `ExercismReposRootPat
 Once all parameters and functions are set up and correctly named in Power Query:
 
 1.  Ensure your `ExercismReposRootPath` parameter points to your local repository root.
-2.  Refresh the `LocalExercisesWithDetails` query.
-  * The output will be a table containing all exercises found in your local `problem-specifications/exercises` directory, along with their parsed metadata and deprecation status.
+2.  Refresh the `LocalExercisesWithDetails` query in Excel (or Power BI).
+  * The output will be a table containing all exercises found in your local `problem-specifications/exercises` directory, along with their parsed metadata and deprecation status. This table can then be loaded into an Excel sheet or used in a Power BI data model.
 
-This provides a powerful way to analyze and work with Exercism problem specifications entirely from your local machine.
+    ![LocalExercisesWithDetails.png](../../assets/LocalExercisesWithDetails.png)
+
+This provides a powerful way to analyze and work with Exercism problem specifications entirely from your local machine, primarily for use in Excel or Power BI.
