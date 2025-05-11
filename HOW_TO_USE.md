@@ -7,7 +7,7 @@ This guide outlines how to use our `GetTrackExercises` Power Query function to g
 ## Setup
 
 Ensure the `GetTrackExercises` function is loaded in your Power Query environment. You can find its definition in this repository at:
-[`powerquery/GetTrackExercises.pq`](src/GetTrackExercises.pq)
+[`powerquery/GetTrackExercises.pq`](src/exercism-api/GetTrackExercises.pq)
 
 ## The Query
 

@@ -18,7 +18,7 @@ These scripts are designed to be robust, including basic error handling for API 
 
 ### 1. `ExercismAPIToken.pq` (Parameter)
 
-* **File:** [`powerquery/ExercismAPIToken.pq`](src/ExercismAPIToken.pq)
+* **File:** [`powerquery/ExercismAPIToken.pq`](src/exercism-api/ExercismAPIToken.pq)
 * **Type:** Parameter Query
 * **Description:** Defines a Power Query parameter to securely store your personal Exercism API token. This allows other queries to make authenticated requests to the Exercism API.
 * **How to Obtain Your Token:**
@@ -32,7 +32,7 @@ These scripts are designed to be robust, including basic error handling for API 
 
 ### 2. `ExercismTracks.pq` (Query)
 
-* **File:** [`powerquery/ExercismTracks.pq`](src/ExercismTracks.pq)
+* **File:** [`powerquery/ExercismTracks.pq`](src/exercism-api/ExercismTracks.pq)
 * **Type:** Query (Self-executing when loaded)
 * **Description:** Fetches a list of all language tracks from the Exercism API. If the `ExercismAPIToken` parameter is set, it will be used for authentication.
 * **Output Columns:**
@@ -50,7 +50,7 @@ These scripts are designed to be robust, including basic error handling for API 
 
 ### 3. `GetTrackExercises.pq` (Function)
 
-* **File:** [`powerquery/GetTrackExercises.pq`](src/GetTrackExercises.pq)
+* **File:** [`powerquery/GetTrackExercises.pq`](src/exercism-api/GetTrackExercises.pq)
 * **Type:** Function
 * **Description:** Fetches a list of exercises for a *specific* language track. If the `ExercismAPIToken` parameter is set, it will be used for authentication, which can provide user-specific data for fields like `IsUnlocked` and `IsRecommended`.
 * **Parameter:**
@@ -81,7 +81,7 @@ These scripts are designed to be robust, including basic error handling for API 
 
 ## Setup & Installation
 
-1.  **Download:** Clone this repository or download the individual `.pq` files from the [`powerquery/`](src/) directory.
+1.  **Download:** Clone this repository or download the individual `.pq` files from the [`src/`](src/) directory.
 2.  **Import into Power Query:**
   * Open your Power Query Editor.
     * **Excel**: `Data` tab -> `Get Data` -> `Launch Power Query Editor...`.
