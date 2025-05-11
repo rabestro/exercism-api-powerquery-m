@@ -1,6 +1,11 @@
+---
+config:
+  layout: dagre
+  theme: mc
+---
 flowchart TD
   subgraph subGraph0["Local API Utilities Workflow"]
-    B("🔧 GetLocalExerciseSlugs")
+    B["🔧 GetLocalExerciseSlugs"]
     A["⚙️ ExercismReposRootPath"]
     C("🔧 GetLocalMetadata")
     D("🔧 GetLocalDeprecationNote")
@@ -12,8 +17,10 @@ flowchart TD
   C --> E
   D --> E
   E --> F
-
-  E@{ shape: hex}
+  B@{ shape: proc}
+  A@{ shape: manual-input}
+  E@{ shape: subproc}
+  F@{ shape: doc}
   B:::func
   A:::param
   C:::func
@@ -25,5 +32,3 @@ flowchart TD
   classDef query fill:#cfc,stroke:#333,stroke-width:2px,color:#333
   classDef output fill:#ffc,stroke:#333,stroke-width:2px,color:#333
   style A fill:#BBDEFB
-
-
