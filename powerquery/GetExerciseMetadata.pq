@@ -18,19 +18,33 @@ let
                 Headers=[#"User-Agent"="PowerQuery-ExercismClient/1.0 (+https://github.com/Rabestro/exercism-api-powerquery-m)"],
                 Timeout=#duration(0,0,15,0) // 15-second timeout for individual file
             ]),
-            TextContent = Text.FromBinary(WebContent, TextEncoding.UTF8),
+            TextContent = Text.FromBinary(WebContent, TextEncoding.Utf8),
             Lines = Lines.FromText(TextContent),
 
             // Inner helper to extract a value for a given key from TOML-like lines
             GetValueFromLines = (textLines as list, keyName as text) as nullable text =>
                 let
-                    LinePrefix = keyName & " = """,
-                    MatchingLine = List.Select(textLines, each Text.StartsWith(_, LinePrefix)),
-                    Value = if List.IsEmpty(MatchingLine) then
+                    LinePrefixPattern = keyName & " = """, // e.g., blurb = "
+                    MatchingLineList = List.Select(textLines, each Text.StartsWith(_, LinePrefixPattern)),
+                    Value = if List.IsEmpty(MatchingLineList) then
                                 null
                             else
-                                // Extract text between the first quote after "key = "" and the closing quote on that line
-                                Text.BetweenDelimiters(List.First(MatchingLine), LinePrefix, """", 0, 0)
+                                let
+                                    FullLine = List.First(MatchingLineList),
+                                    // Get the part of the string after 'keyName = "'
+                                    ValuePart = Text.Range(FullLine, Text.Length(LinePrefixPattern)),
+                                    // Check if this part ends with a quote. If so, remove it.
+                                    // This assumes the string doesn't have trailing comments on the same line after the quote.
+                                    TrimmedValue = if Text.EndsWith(ValuePart, """") then
+                                                     Text.Start(ValuePart, Text.Length(ValuePart) - 1)
+                                                 else
+                                                     ValuePart, // Should not happen for valid simple TOML strings but good for robustness
+                                    // Replace escaped quotes \" with " and escaped backslashes \\ with \
+                                    // Order matters: unescape backslashes first if they could be part of other escapes (not an issue here)
+                                    // For simple \" and \\, this order is fine.
+                                    UnescapedValue = Text.Replace(Text.Replace(TrimmedValue, "\\""", """"), "\\\\", "\")
+                                in
+                                    UnescapedValue
                 in Value,
 
             ExtractedTitle = GetValueFromLines(Lines, "title"),
@@ -46,6 +60,6 @@ let
                 error_message = null // No error if successful
             ]
     // If Web.Contents or parsing fails, return default record with an error message
-    otherwise DefaultMetadataRecord & [error_message = "Failed to fetch or parse metadata from: " & MetadataURL & ". Error: " & Text.FromBinary(Error.Message, TextEncoding.UTF8) ] // Added Error.Message for more details
+    otherwise DefaultMetadataRecord & [error_message = "Failed to fetch or parse metadata from: " & MetadataURL & ". Error: " & Error.Message ] 
 in
     FetchedMetadata
