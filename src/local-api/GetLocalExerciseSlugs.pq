@@ -14,5 +14,3 @@
         ExerciseSlugs = ExerciseFolders[Name]
     in
         ExerciseSlugs
-
-        

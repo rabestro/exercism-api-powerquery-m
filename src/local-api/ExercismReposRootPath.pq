@@ -27,11 +27,9 @@
 // - Users of these local-file-based queries will need to manage updating their local clones
 //   (e.g., using 'git pull' within each repository) to get the latest versions.
 let
-    // Current Value of the parameter.
     // Replace the placeholder string below with the actual absolute path to your
     // root directory containing local clones of Exercism repositories.
     Source = "~/IdeaProjects/Exercism" meta [
-        // Metadata defining this query as a parameter:
         IsParameterQuery = true,            
         IsParameterQueryRequired = true,    
         Type = "Text"
