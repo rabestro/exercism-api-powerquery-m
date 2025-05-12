@@ -8,11 +8,11 @@
 //   A nullable text value: The content of the '.deprecated' file if it exists, otherwise null.
 // Depends on:
 //   - 'ExercismReposRootPath' parameter: The root path to the directory containing cloned Exercism repositories.
-(slug as text) =>
-    let
-        NotePath = ExercismReposRootPath & "/problem-specifications/exercises/" & slug & "/.deprecated",
-        BinaryContent = try File.Contents(NotePath) otherwise null,
-        Note = Text.FromBinary(BinaryContent, TextEncoding.Utf8)
+    (slug as text) =>
+        let
+            NotePath = ExercismReposRootPath & "/problem-specifications/exercises/" & slug & "/.deprecated",
+            BinaryContent = try File.Contents(NotePath) otherwise null,
+            Note = Text.FromBinary(BinaryContent, TextEncoding.Utf8)
 
-    in
-        Note
+        in
+            Note
