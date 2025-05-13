@@ -1,4 +1,4 @@
-# Power Query Extractor for Exercism Exercise Specifications
+# Power Query Extractor for Exercise Specifications
 
 ## Overview
 
