@@ -1,101 +1,48 @@
-# Local Files API Utilities for Exercism Data
-
-This document describes the Power Query M utilities designed to work with local clones of Exercism repositories, primarily focusing on the `exercism/problem-specifications` repository at present. These utilities allow you to access exercise data directly from your file system, which is useful for offline work, avoiding API rate limits, and working with specific versions of the specifications.
-
-Primarily, these tools are designed to help you get an overview, statistics, and detailed data about exercises directly into **Microsoft Excel**. They should also work seamlessly in **Power BI Desktop** for more advanced data modeling and visualization.
+# Power Query Extractor for Exercism Exercise Specifications
 
 ## Overview
 
-The utilities in this section enable you to:
-* Define a root path for your local Exercism repository clones.
-* List exercise slugs from your local `problem-specifications` clone.
-* Fetch and parse `metadata.toml` for each local exercise.
-* Check for and retrieve deprecation notes from local `.deprecated` files.
-* Combine all this information into a comprehensive table of local exercises with their details, perfect for analysis in Excel or Power BI.
+This Power Query script extracts metadata and deprecation status for all exercises from a local clone of the `exercism/problem-specifications` repository. It's designed for Exercism maintainers and contributors to review this data in Microsoft Excel or Power BI.
 
-While currently tailored for `problem-specifications`, the `ExercismReposRootPath` parameter is designed to support future extensions for accessing data from locally cloned track repositories (e.g., `awk`, `bash`).
+## Prerequisites
 
-## Prerequisites & Setup
+* Microsoft Excel (2016 or later / Microsoft 365 subscription) or Power BI Desktop.
+* A local clone of the [exercism/problem-specifications](https://github.com/exercism/problem-specifications) repository.
+  * If you don't have it: `git clone https://github.com/exercism/problem-specifications.git`
+* The Power Query script files (or the Excel/Power BI file containing them).
 
-1.  **Local Clones of Exercism Repositories:**
-  * You must have a local clone of the `exercism/problem-specifications` repository.
-      ```bash
-      # Example: Create a root directory for your Exercism clones
-      mkdir ~/ExercismClones
-      cd ~/ExercismClones
-      git clone [https://github.com/exercism/problem-specifications.git](https://github.com/exercism/problem-specifications.git)
-      ```
-  * In the future, you might clone other track repositories (e.g., `awk`, `bash`) into this same root directory.
-  * **Important:** You are responsible for keeping your local clones up-to-date (e.g., by running `git pull` within each repository). These utilities will only see the data present in your local files at the time of execution.
+## Setup Instructions
 
-2.  **Configure Root Path Parameter:**
-  * Import the `ExercismReposRootPath.pq` file into your Power Query environment.
-  * **Rename the imported query to `ExercismReposRootPath`**.
-  * Edit this `ExercismReposRootPath` query and replace the placeholder path with the **absolute path** to your root directory where you cloned the Exercism repositories (e.g., `~/ExercismClones` from the example above). See the comments within `ExercismReposRootPath.pq` for detailed instructions.
+### Key Parameter: `ExercismRepositoryPath`
 
-3.  **Import Utilities:**
-  * Import the other `.pq` files from this `local-api` directory into your Power Query environment.
-  * **Rename the imported queries** to match the suggested names (e.g., `GetLocalMetadata`, `LocalExercisesWithDetails`) for dependencies to work correctly. This is typically done by right-clicking the query in the Power Query Editor's "Queries" pane and selecting "Rename".
+This script requires you to set the `ExercismRepositoryPath` parameter. This parameter **must be the absolute path to the directory *containing* your local `problem-specifications` clone.**
 
-    ![local-api-utilities.png](../../assets/local-api-utilities.png)
+The script constructs the path to the exercises like this: `ExercismRepositoryPath & "/problem-specifications/exercises/"`.
 
-## Available Utilities
+**Important:**
+* Use `/` (forward slashes) as the path separator. Power Query handles this correctly on Windows, macOS, and Linux.
+* The path must be absolute.
 
-### 1. `ExercismReposRootPath.pq`
+![power-query-editor.png](../../assets/power-query-editor.png)
 
-* **Type:** Parameter Query
-* **Query Name in Editor:** `ExercismReposRootPath`
-* **Description:** Defines the crucial parameter for the root file system path where your Exercism repositories (like `problem-specifications`) are cloned. All other local utilities depend on this parameter being correctly set.
-* **Setup:** Requires user to edit the query and set their specific local path.
+## Running the Query & Viewing Results
 
-### 2. `GetLocalExerciseSlugs.pq`
+1.  After setting the parameter and closing the Power Query Editor, the main query, `ExercisesTable`, should automatically refresh and load the data.
+2.  If you need to refresh the data later (e.g., after pulling new changes to the local repository):
+  * **In Excel:** Go to the `Data` tab and click `Refresh All`.
+  * **In Power BI:** Click the `Refresh` button on the `Home` tab.
+    The data will appear as a table in your Excel sheet or as a dataset in Power BI.
 
-* **Type:** Function
-* **Query Name in Editor:** `GetLocalExerciseSlugs`
-* **Description:** Lists all exercise slugs (directory names) found within the `exercises` subfolder of your local `problem-specifications` clone.
-* **Parameters:** None.
-* **Returns:** A list of text values (exercise slugs). Includes basic error handling if the path is inaccessible.
-* **Depends on:** `ExercismReposRootPath` parameter.
+## Expected Output
 
-### 3. `GetLocalMetadata.pq`
+You will get a table with the following columns for each exercise:
 
-* **Type:** Function
-* **Query Name in Editor:** `GetLocalMetadata`
-* **Description:** Fetches and parses the `metadata.toml` file for a given exercise slug from your local `problem-specifications` clone.
-* **Parameter:**
-  * `exerciseSlug` (text): The slug of the exercise.
-* **Returns:** A record containing `title`, `blurb`, `source`, `source_url`, and `error_message` (if any).
-* **Depends on:** `ExercismReposRootPath` parameter.
+* `Name`: The slug/identifier of the exercise (from its folder name, e.g., `hello-world`).
+* `title`: The display title of the exercise (from `metadata.toml`).
+* `blurb`: A short description of the exercise (from `metadata.toml`).
+* `source`: The credited source of the exercise, if any (from `metadata.toml`).
+* `source_url`: A URL to the source, if any (from `metadata.toml`).
+* `deprecated`: A boolean value (`TRUE` if the exercise is marked as deprecated via a `.deprecated` file, `FALSE` otherwise).
+* `note`: The content of the `.deprecated` file (typically a reason or link to a discussion). This will be `null` if the exercise is not deprecated.
 
-### 4. `GetLocalDeprecationNote.pq`
-
-* **Type:** Function
-* **Query Name in Editor:** `GetLocalDeprecationNote`
-* **Description:** Checks for a `.deprecated` file for a given exercise slug in your local `problem-specifications` clone and returns its text content if found.
-* **Parameter:**
-  * `exerciseSlug` (text): The slug of the exercise.
-* **Returns:** Text content of the `.deprecated` file or `null` if not found or an error occurs.
-* **Depends on:** `ExercismReposRootPath` parameter.
-
-### 5. `LocalExercisesWithDetails.pq`
-
-* **Type:** Query
-* **Query Name in Editor:** `LocalExercisesWithDetails`
-* **Description:** This is the main query that combines the functionalities above. It lists all exercises from your local `problem-specifications` clone and enriches them with:
-  * Metadata from `metadata.toml`.
-  * A boolean flag `IsDeprecated`.
-  * The `DeprecationNote` if applicable.
-* **Output Columns:** `slug`, `Title`, `Blurb`, `Source`, `SourceURL`, `IsDeprecated`, `DeprecationNote`, `MetadataError`.
-* **Depends on:** `GetLocalExerciseSlugs`, `GetLocalMetadata`, `GetLocalDeprecationNote`, and `ExercismReposRootPath`.
-
-## Usage Example
-
-Once all parameters and functions are set up and correctly named in Power Query:
-
-1.  Ensure your `ExercismReposRootPath` parameter points to your local repository root.
-2.  Refresh the `LocalExercisesWithDetails` query in Excel (or Power BI).
-  * The output will be a table containing all exercises found in your local `problem-specifications/exercises` directory, along with their parsed metadata and deprecation status. This table can then be loaded into an Excel sheet or used in a Power BI data model.
-
-    ![LocalExercisesWithDetails.png](../../assets/LocalExercisesWithDetails.png)
-
-This provides a powerful way to analyze and work with Exercism problem specifications entirely from your local machine, primarily for use in Excel or Power BI.
+![common-exercises.png](../../assets/common-exercises.png)

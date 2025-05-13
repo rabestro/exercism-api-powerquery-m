@@ -1,25 +1,25 @@
 let
     ExercisesPath = ExercismRepositoryPath & "/problem-specifications/exercises/",
-
     DirectoryContents = Folder.Contents(ExercisesPath),
     ExerciseFolders = Table.SelectRows(DirectoryContents, each[Attributes][Kind] = "Folder"),
-    Exercises = Table.AddColumn(
+    ProcessedExerciseFolders = Table.AddColumn(
         ExerciseFolders,
         "metadata",
         each
             let
                 MetaRow = Table.SelectRows([Content], each ([Name] = "metadata.toml")),
+                DeprRow = Table.SelectRows([Content], each ([Name] = ".deprecated")),
+                IsDeprecated = not Table.IsEmpty(DeprRow),
+                DeprecationNote = if IsDeprecated then Text.FromBinary(DeprRow{0}[Content]) else null,
                 MetaContent = MetaRow{[Name = "metadata.toml"]}[Content],
                 MetaEntries = Csv.Document(MetaContent, {"Name", "Value"}, " = ", ExtraValues.Ignore),
                 MetaData = Record.FromTable(MetaEntries)
             in
-                MetaData
+                MetaData & [deprecated = IsDeprecated, note = DeprecationNote]
     ),
-    TwoColumns = Table.SelectColumns(Exercises, {"Name", "metadata"}),
+    SelectedExerciseAndMetadata = Table.SelectColumns(ProcessedExerciseFolders, {"Name", "metadata"}),
     ExercisesTable = Table.ExpandRecordColumn(
-        TwoColumns,
-        "metadata",
-        {"title", "blurb", "source", "source_url"}
+        SelectedExerciseAndMetadata, "metadata", {"title", "blurb", "source", "source_url", "deprecated", "note"}
     )
 in
     ExercisesTable
