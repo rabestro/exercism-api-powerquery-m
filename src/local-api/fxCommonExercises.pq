@@ -14,6 +14,14 @@
     table: A table where each row represents an exercise, with columns for its
           name and extracted metadata fields: "title", "blurb", "source",
           "source_url", "deprecated" (boolean), and "note" (deprecation note).
+
+  Example Usage:
+    let
+      exercises = fxPracticeExercises("C:/MyDev/Exercism")
+    in
+      exercises
+
+  Author: Jegors Čemisovs
 */
 
 let
