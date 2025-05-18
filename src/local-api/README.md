@@ -1,4 +1,4 @@
-# Power Query Extractor for Exercism Exercise Data
+# Power Query Extractor for Exercise Data (Local)
 
 ## Overview
 
@@ -97,6 +97,8 @@ This query provides a table with details about practice exercises for a specific
 * `uuid`: The universally unique identifier for the exercise.
 * `difficulty`: A numerical representation of the exercise's difficulty.
 * `status`: The current status of the exercise (e.g., "active", "beta").
+
+![local-practice-exercises-table.png](../../assets/local-practice-exercises-table.png)
 
 ## Troubleshooting
 
