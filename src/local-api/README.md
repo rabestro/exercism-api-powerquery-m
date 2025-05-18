@@ -43,12 +43,14 @@ This solution relies on parameters you need to configure in Power Query.
     * Use `/` (forward slashes) as the path separator. Power Query handles this correctly on all platforms.
     * The path must be **absolute**.
 
+![ExercismRepositoryPath.png](../../assets/ExercismRepositoryPath.png)
+
 2.  **`TrackSlugParameter` (Text Parameter - for `fxPracticeExercises`)**
   * **Purpose:** Specifies the language track identifier (slug) for which you want to retrieve practice exercise data using `fxPracticeExercises`.
   * **Example Values:** `"javascript"`, `"python"`, `"csharp"`
   * You will need to set or change this parameter to switch between different language tracks for the `fxPracticeExercises` output.
 
-![power-query-editor.png](../../assets/power-query-editor.png)
+![fxPracticeExercises.png](../../assets/fxPracticeExercises.png)
 
 ## Running the Queries & Viewing Results
 
