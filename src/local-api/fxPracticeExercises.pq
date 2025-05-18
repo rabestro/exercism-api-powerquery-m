@@ -23,20 +23,6 @@
     in
       exerciseDetails
 
-  Assumptions:
-    1. A 'config.json' file exists at the path: '<rootPath>/<trackSlug>/config.json'.
-       The function will error if this file is not found.
-    2. The 'rootPath' parameter does not end with a forward slash ('/'). If it does,
-       the path to 'config.json' might contain '//'.
-    3. The 'config.json' file has a specific JSON structure:
-       - It's an object containing an "exercises" key.
-       - The "exercises" object contains a "practice" key.
-       - The "practice" key holds a list of records.
-       - Each record in the "practice" list is expected to contain at least
-         the fields: "slug", "name", "uuid", "difficulty", and "status".
-       The function will error if this structure is not met (e.g., keys are missing
-       or data types are unexpected).
-
   Author: Jegors Čemisovs
 */
 let
