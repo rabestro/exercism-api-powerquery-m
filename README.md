@@ -1,6 +1,6 @@
-# Power Query M for Exercism API
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+# Power Query M for Exercism API
 
 Welcome! This repository provides Power Query M scripts to easily fetch data directly from the [Exercism.org API](https://exercism.org/docs/api/v2). This allows you to pull information about language tracks and their exercises into environments like Excel or Power BI for analysis, reporting, or track maintenance.
 
